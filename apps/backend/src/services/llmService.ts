@@ -380,7 +380,25 @@ async function askAnthropic(
               input?: unknown;
             }
         >;
+        usage?: {
+          input_tokens?: number;
+          output_tokens?: number;
+          cache_creation_input_tokens?: number;
+          cache_read_input_tokens?: number;
+        };
       };
+
+    if (data.usage) {
+      console.log('[usage] Anthropic', {
+        model: ANTHROPIC_MODEL,
+        inputTokens: data.usage.input_tokens ?? 0,
+        outputTokens: data.usage.output_tokens ?? 0,
+        cacheCreationTokens:
+          data.usage.cache_creation_input_tokens ?? 0,
+        cacheReadTokens:
+          data.usage.cache_read_input_tokens ?? 0,
+      });
+    }
 
     if (structuredSchema) {
       const toolUse =

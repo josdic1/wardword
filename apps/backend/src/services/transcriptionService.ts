@@ -141,6 +141,16 @@ async function transcribeWithOpenAI(
     const payload =
       await response.json() as {
         text?: string;
+        usage?: {
+          type?: string;
+          input_tokens?: number;
+          output_tokens?: number;
+          total_tokens?: number;
+          input_token_details?: {
+            audio_tokens?: number;
+            text_tokens?: number;
+          };
+        };
         error?: {
           message?: string;
         };
@@ -153,6 +163,17 @@ async function transcribeWithOpenAI(
           response.statusText
         }`,
       );
+    }
+
+    if (payload.usage) {
+      console.log('[usage] OpenAI transcription', {
+        model: OPENAI_TRANSCRIPTION_MODEL,
+        inputTokens: payload.usage.input_tokens ?? 0,
+        audioTokens:
+          payload.usage.input_token_details?.audio_tokens ?? 0,
+        outputTokens: payload.usage.output_tokens ?? 0,
+        totalTokens: payload.usage.total_tokens ?? 0,
+      });
     }
 
     const transcript =
