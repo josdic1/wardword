@@ -71,12 +71,13 @@ textarea {
   place-items: center;
   width: 38px;
   height: 38px;
-  border-radius: 9px;
-  background: var(--clinical);
-  color: white;
-  font-size: 18px;
-  font-weight: 750;
-  letter-spacing: -0.04em;
+  flex: 0 0 38px;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .brand-name {

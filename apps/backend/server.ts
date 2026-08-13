@@ -146,14 +146,14 @@ async function startServer(): Promise<void> {
     } catch (error) {
       console.log('unavailable.');
       console.warn(
-        'WardWord will use the conservative structured fallback until clinical AI is available:',
+        'IRVING+ will use the conservative structured fallback until clinical AI is available:',
         error instanceof Error ? error.message : error,
       );
     }
   }
 
   app.listen(port, host, () => {
-    console.log(`WardWord ready at http://localhost:${port}`);
+    console.log(`IRVING+ ready at http://localhost:${port}`);
     console.log(
       `Clinical AI: ${aiReady ? 'ready' : 'fallback mode'}`,
     );

@@ -457,9 +457,11 @@ export function App() {
     <div className={`app-shell app-shell--${screen}`}>
       <header className="topbar">
         <div className="brand-lockup">
-          <div className="brand-mark" aria-hidden="true">W</div>
+          <div className="brand-mark" aria-hidden="true">
+            <img src="/irving-mark.svg" alt="" />
+          </div>
           <div>
-            <div className="brand-name">WardWord</div>
+            <div className="brand-name">IRVING+</div>
             <div className="brand-subtitle">Clinical dictation</div>
           </div>
         </div>
@@ -665,7 +667,7 @@ export function App() {
             </div>
 
             {extractionMode === 'structured-fallback' ? (
-              <p className="processing-note">AI structuring was unavailable. WardWord separated the dictated sections without inventing missing clinical content.</p>
+              <p className="processing-note">AI structuring was unavailable. IRVING+ separated the dictated sections without inventing missing clinical content.</p>
             ) : null}
           </section>
         ) : (
@@ -759,7 +761,7 @@ export function App() {
       {screen !== 'review' ? (
         <nav
           className="mobile-app-nav"
-          aria-label="WardWord sections"
+          aria-label="IRVING+ sections"
         >
           <button
             className={

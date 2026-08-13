@@ -10,7 +10,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(payload?.error || 'WardWord request failed.');
+    throw new Error(payload?.error || 'IRVING+ request failed.');
   }
 
   return payload as T;

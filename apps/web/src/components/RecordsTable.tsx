@@ -37,7 +37,7 @@ function patientName(note: SavedNote): string {
 
 function exportFilename(extension: 'txt' | 'json'): string {
   const date = new Date().toISOString().slice(0, 10);
-  return `wardword-library-${date}.${extension}`;
+  return `irving-library-${date}.${extension}`;
 }
 
 function downloadFile(
@@ -70,7 +70,7 @@ function notesAsText(notes: SavedNote[]): string {
       const saved = new Date(note.createdAt).toLocaleString();
 
       return [
-        `WARDWORD RECORD ${index + 1}`,
+        `IRVING+ RECORD ${index + 1}`,
         `Patient: ${patientName(note)}`,
         `Saved: ${saved}`,
         `ID: ${note.id}`,
