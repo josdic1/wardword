@@ -1,0 +1,20 @@
+{
+  "name": "wardform-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "apps/backend",
+    "apps/web"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=@wardform/shared",
+    "build": "npm run build:shared && npm run build --workspace=web && npm run build --workspace=@wardform/backend",
+    "dev": "npm run build:shared && node scripts/dev.mjs",
+    "test": "npm run build:shared && npm run test --workspace=@wardform/backend",
+    "start": "NODE_ENV=production npm run start --workspace=@wardform/backend",
+    "demo": "npm run build && npm run start"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}

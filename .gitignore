@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+apps/*/dist/
+packages/*/dist/
+*.tsbuildinfo
+
+# Local clinical records
+apps/backend/notes.json
+apps/backend/notes.pre-encounter.json
+uploads/
+
+# Local AI binaries / models
+apps/backend/models/
+*.bin
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
