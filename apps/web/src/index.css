@@ -1639,3 +1639,102 @@ textarea {
     touch-action: manipulation;
   }
 }
+
+
+/* ── Microphone preparation ──────────────────────────────── */
+
+.microphone-preparing {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: #f8faf8;
+  color: var(--ink);
+  text-align: center;
+}
+
+.microphone-preparing__eyebrow {
+  margin-bottom: 18px;
+
+  color: var(--clinical);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.microphone-preparing__activity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  height: 18px;
+  margin-bottom: 15px;
+}
+
+.microphone-preparing__activity span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+  background: var(--clinical);
+
+  animation: microphone-preparing-pulse 1.15s ease-in-out infinite;
+}
+
+.microphone-preparing__activity span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.microphone-preparing__activity span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+.microphone-preparing strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.microphone-preparing p {
+  margin: 7px 0 0;
+
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.capture-transcript-stage {
+  position: relative;
+}
+
+.capture-textarea--preparing {
+  visibility: hidden;
+}
+
+@keyframes microphone-preparing-pulse {
+  0%,
+  70%,
+  100% {
+    opacity: 0.28;
+    transform: translateY(0);
+  }
+
+  35% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .microphone-preparing__activity span {
+    animation: none;
+    opacity: 0.72;
+  }
+}

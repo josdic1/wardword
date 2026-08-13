@@ -536,6 +536,27 @@ export function App() {
                 </button>
               </div>
               <div className="capture-transcript-stage">
+                {recordingStarting ? (
+                  <div
+                    className="microphone-preparing"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <div className="microphone-preparing__eyebrow">
+                      Preparing microphone
+                    </div>
+
+                    <div className="microphone-preparing__activity" aria-hidden="true">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+
+                    <strong>Establishing audio input</strong>
+                    <p>Recording has not started yet.</p>
+                  </div>
+                ) : null}
+
                 <textarea
                   id="dictation"
                   value={textInput}
@@ -546,6 +567,7 @@ export function App() {
                   placeholder="Dictate the visit naturally, or paste a test script here."
                   rows={9}
                   disabled={recording || busy}
+                  className={recordingStarting ? 'capture-textarea--preparing' : undefined}
                 />
 
                 {recording ? (
