@@ -15,6 +15,7 @@ import {
   appendRecordingRecoveryChunk,
   beginRecordingRecovery,
   clearRecordingRecovery,
+  loadRecordingRecovery,
 } from './services/recordingRecovery';
 
 const emptyEncounter: EncounterMetadata = {
@@ -242,6 +243,56 @@ export function App() {
 
   useEffect(() => {
     void loadNotes();
+
+    void (async () => {
+      try {
+        const recovered = await loadRecordingRecovery();
+
+        if (!recovered) {
+          return;
+        }
+
+        const audio = new Blob(
+          recovered.chunks,
+          { type: recovered.meta.mimeType },
+        );
+
+        setBusy(true);
+        setProcessingStage('transcribing');
+        setStatus('Recovering interrupted recording…');
+
+        const transcript =
+          await transcribeRecording(audio);
+
+        const combined = [
+          recovered.meta.transcript,
+          transcript,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        transcriptRef.current = combined;
+        setTextInput(combined);
+
+        await clearRecordingRecovery();
+
+        setBusy(false);
+        setProcessingStage(null);
+        setStatus(
+          'Interrupted recording recovered. Review before continuing.',
+        );
+      } catch (error) {
+        setBusy(false);
+        setProcessingStage(null);
+        setStatus(
+          error instanceof Error
+            ? `Unable to recover interrupted recording: ${error.message}`
+            : 'Unable to recover interrupted recording.',
+        );
+      }
+    })();
   }, []);
 
   useEffect(() => {
