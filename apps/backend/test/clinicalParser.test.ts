@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseClinicalDictation } from '../src/services/clinicalParser';
+import {
+  buildClinicalRecordFromFactLedger,
+  parseClinicalDictation,
+} from '../src/services/clinicalParser';
 
 const bronchitis = `Patient returns for a ten-day follow-up regarding persistent productive cough, retrosternal chest tightness, and low-grade fevers. Reports fatigue and sleep disruption due to paroxysmal coughing spells productive of thick green sputum.
 
@@ -36,4 +39,39 @@ test('psoriasis dictation is separated into the intended SOAP fields', async () 
   assert.match(soap.assessment, /severe exacerbation of chronic plaque psoriasis/i);
   assert.match(soap.plan, /narrowband UVB phototherapy/i);
   assert.match(soap.plan, /Follow-up scheduled in four weeks/i);
+});
+
+
+test('explicit clinician SOAP section overrides inferred fact ownership', () => {
+  const { soap } = buildClinicalRecordFromFactLedger({
+    patientName: '',
+    facts: [
+      {
+        kind: 'procedure',
+        text: 'Meningococcal booster vaccine administered today.',
+        explicitSection: 'plan',
+      },
+      {
+        kind: 'finding',
+        text: 'Lungs clear to auscultation.',
+        explicitSection: 'unspecified',
+      },
+    ],
+    assessmentSummary: '',
+  });
+
+  assert.match(
+    soap.plan,
+    /meningococcal booster vaccine administered today/i,
+  );
+
+  assert.doesNotMatch(
+    soap.objective,
+    /meningococcal/i,
+  );
+
+  assert.match(
+    soap.objective,
+    /lungs clear to auscultation/i,
+  );
 });

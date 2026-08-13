@@ -35,7 +35,7 @@ const FACT_LEDGER_JSON_SCHEMA: Record<string, unknown> = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['kind', 'text'],
+        required: ['kind', 'text', 'explicitSection'],
         properties: {
           kind: {
             type: 'string',
@@ -55,6 +55,16 @@ const FACT_LEDGER_JSON_SCHEMA: Record<string, unknown> = {
           },
           text: {
             type: 'string',
+          },
+          explicitSection: {
+            type: 'string',
+            enum: [
+              'subjective',
+              'objective',
+              'assessment',
+              'plan',
+              'unspecified',
+            ],
           },
         },
       },
@@ -85,12 +95,19 @@ const FactLedgerSchema = z.object({
     z.object({
       kind: FactKindSchema,
       text: z.string().trim().min(1),
+      explicitSection: z.enum([
+        'subjective',
+        'objective',
+        'assessment',
+        'plan',
+        'unspecified',
+      ]),
     }),
   ),
   assessmentSummary: z.string(),
 });
 
-type FactLedger = z.infer<typeof FactLedgerSchema>;
+export type FactLedger = z.infer<typeof FactLedgerSchema>;
 
 function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
@@ -301,6 +318,19 @@ Break the clinically relevant content into small independent facts.
 
 Every clinically relevant source fact must appear exactly once in facts.
 
+EXPLICIT SOAP SECTION
+For every fact, also return explicitSection.
+
+Use:
+- subjective if the clinician explicitly placed the fact under Subjective
+- objective if the clinician explicitly placed the fact under Objective
+- assessment if the clinician explicitly placed the fact under Assessment
+- plan if the clinician explicitly placed the fact under Plan
+- unspecified if the clinician did not explicitly assign that fact to a SOAP section
+
+Do not infer explicitSection from the fact's meaning.
+Only preserve section ownership actually stated by the clinician.
+
 Use only these kinds:
 
 patient_history
@@ -392,7 +422,7 @@ function joinFacts(values: string[]): string {
     .join(' ');
 }
 
-function buildClinicalRecordFromFactLedger(
+export function buildClinicalRecordFromFactLedger(
   ledger: FactLedger,
 ): {
   encounter: EncounterMetadata;
@@ -419,6 +449,26 @@ function buildClinicalRecordFromFactLedger(
   const plan: string[] = [];
 
   for (const fact of ledger.facts) {
+    if (fact.explicitSection === 'subjective') {
+      subjective.push(fact.text);
+      continue;
+    }
+
+    if (fact.explicitSection === 'objective') {
+      objective.push(fact.text);
+      continue;
+    }
+
+    if (fact.explicitSection === 'assessment') {
+      explicitAssessment.push(fact.text);
+      continue;
+    }
+
+    if (fact.explicitSection === 'plan') {
+      plan.push(fact.text);
+      continue;
+    }
+
     if (subjectiveKinds.has(fact.kind)) {
       subjective.push(fact.text);
       continue;
