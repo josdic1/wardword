@@ -458,7 +458,7 @@ export function App() {
       <header className="topbar">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true">
-            <img src="/irving-mark.svg" alt="" />
+            <img src="/irving-app-icon.png" alt="" />
           </div>
           <div>
             <div className="brand-name">IRVING+</div>

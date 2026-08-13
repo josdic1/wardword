@@ -1542,3 +1542,100 @@ textarea {
     min-height: 48px;
   }
 }
+
+/* ── Native-feeling mobile viewport lock ─────────────────── */
+
+@media (max-width: 680px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  body {
+    position: fixed;
+    inset: 0;
+    touch-action: manipulation;
+  }
+
+  #root {
+    position: relative;
+  }
+
+  .app-shell--capture,
+  .app-shell--records,
+  .app-shell--review {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100dvh;
+    max-width: 100vw;
+    min-height: 0;
+
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .app-shell--capture .page,
+  .app-shell--records .page,
+  .app-shell--review .page {
+    width: min(100% - 24px, 920px);
+    max-width: calc(100vw - 24px);
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+  }
+
+  /* Dictate: transcript is the only movable content. */
+  .page--capture .capture-transcript-stage {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .page--capture .capture-transcript-stage textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 100%;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+
+    resize: none;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Review: SOAP body is the only scrolling region. */
+  .review-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Records: list is the only scrolling region. */
+  .records-screen .records-table-shell {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .topbar,
+  .capture-actions,
+  .review-actions,
+  .mobile-app-nav {
+    touch-action: manipulation;
+  }
+}
