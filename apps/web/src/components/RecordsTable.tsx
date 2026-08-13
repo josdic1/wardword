@@ -35,6 +35,65 @@ function patientName(note: SavedNote): string {
   return note.encounter.patientName.trim() || 'Clinical record';
 }
 
+function exportFilename(extension: 'txt' | 'json'): string {
+  const date = new Date().toISOString().slice(0, 10);
+  return `wardword-library-${date}.${extension}`;
+}
+
+function downloadFile(
+  contents: string,
+  filename: string,
+  mimeType: string,
+): void {
+  const blob = new Blob([contents], {
+    type: `${mimeType};charset=utf-8`,
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = filename;
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+function notesAsText(notes: SavedNote[]): string {
+  return notes
+    .map((note, index) => {
+      const saved = new Date(note.createdAt).toLocaleString();
+
+      return [
+        `WARDWORD RECORD ${index + 1}`,
+        `Patient: ${patientName(note)}`,
+        `Saved: ${saved}`,
+        `ID: ${note.id}`,
+        '',
+        'SUBJECTIVE',
+        note.soap.subjective || '—',
+        '',
+        'OBJECTIVE',
+        note.soap.objective || '—',
+        '',
+        'ASSESSMENT',
+        note.soap.assessment || '—',
+        '',
+        'PLAN',
+        note.soap.plan || '—',
+        '',
+        'SOURCE DICTATION',
+        note.content || '—',
+      ].join('\n');
+    })
+    .join('\n\n' + '─'.repeat(72) + '\n\n');
+}
+
 export function RecordsTable({ notes }: RecordsTableProps) {
   const [query, setQuery] = useState('');
   const [sortMode, setSortMode] =
@@ -147,10 +206,42 @@ export function RecordsTable({ notes }: RecordsTableProps) {
         </label>
       </div>
 
-      <div className="records-result-count" aria-live="polite">
-        {visibleNotes.length}{' '}
-        {visibleNotes.length === 1 ? 'record' : 'records'}
-        {query ? ' found' : ''}
+      <div className="records-meta-row">
+        <div className="records-result-count" aria-live="polite">
+          {visibleNotes.length}{' '}
+          {visibleNotes.length === 1 ? 'record' : 'records'}
+          {query ? ' found' : ''}
+        </div>
+
+        <div className="records-export" aria-label="Download record library">
+          <button
+            type="button"
+            disabled={!notes.length}
+            onClick={() =>
+              downloadFile(
+                notesAsText(notes),
+                exportFilename('txt'),
+                'text/plain',
+              )
+            }
+          >
+            Download TXT
+          </button>
+
+          <button
+            type="button"
+            disabled={!notes.length}
+            onClick={() =>
+              downloadFile(
+                JSON.stringify(notes, null, 2),
+                exportFilename('json'),
+                'application/json',
+              )
+            }
+          >
+            Download JSON
+          </button>
+        </div>
       </div>
 
       {visibleNotes.length ? (

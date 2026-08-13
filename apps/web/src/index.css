@@ -679,9 +679,45 @@ textarea {
   cursor: pointer;
 }
 
+.records-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .records-result-count {
   color: var(--muted);
   font-size: 11px;
+}
+
+.records-export {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.records-export button {
+  min-height: 30px;
+  border: 1px solid #d4d9d6;
+  border-radius: 7px;
+  padding: 5px 9px;
+  background: white;
+  color: #3b4440;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.records-export button:hover:not(:disabled) {
+  border-color: #aeb9b3;
+  background: #f8faf8;
+}
+
+.records-export button:disabled {
+  cursor: default;
+  opacity: 0.4;
 }
 
 .records-table-shell {
@@ -851,6 +887,14 @@ textarea {
 
   .records-sort {
     min-width: 0;
+  }
+
+  .records-meta-row {
+    align-items: flex-start;
+  }
+
+  .records-export {
+    flex-shrink: 0;
   }
 
   .records-table-shell {
