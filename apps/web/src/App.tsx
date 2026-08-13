@@ -546,14 +546,12 @@ export function App() {
                       Preparing microphone
                     </div>
 
-                    <div className="microphone-preparing__activity" aria-hidden="true">
-                      <span />
-                      <span />
+                    <div className="microphone-preparing__meter" aria-hidden="true">
                       <span />
                     </div>
 
-                    <strong>Establishing audio input</strong>
-                    <p>Recording has not started yet.</p>
+                    <strong>Establishing microphone…</strong>
+                    <p>Recording has not started.</p>
                   </div>
                 ) : null}
 
