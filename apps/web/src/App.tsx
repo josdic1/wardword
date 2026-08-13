@@ -62,7 +62,7 @@ export function App() {
     useState<ProcessingStage>(null);
   const [recording, setRecording] = useState(false);
   const [recordingPaused, setRecordingPaused] = useState(false);
-  const [extractionMode, setExtractionMode] = useState<'local-ai' | 'structured-fallback' | null>(null);
+  const [extractionMode, setExtractionMode] = useState<'clinical-ai' | 'structured-fallback' | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);

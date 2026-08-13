@@ -19,7 +19,7 @@ export const PreviewNoteResponseSchema = z.object({
   content: z.string(),
   encounter: EncounterMetadataSchema,
   soap: SoapFieldsSchema,
-  extractionMode: z.enum(['local-ai', 'structured-fallback']),
+  extractionMode: z.enum(['clinical-ai', 'structured-fallback']),
 });
 
 export const SaveNoteRequestSchema = z.object({

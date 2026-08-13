@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { askLocalLLM } from './llmService';
 
 export type ExtractionMode =
-  | 'local-ai'
+  | 'clinical-ai'
   | 'structured-fallback';
 
 export interface ParsedClinicalDictation {
@@ -483,7 +483,7 @@ async function extractClinicalRecordWithLocalAI(
 
 export async function parseClinicalDictation(
   text: string,
-  options: { useLocalAI?: boolean } = {},
+  options: { useClinicalAI?: boolean } = {},
 ): Promise<ParsedClinicalDictation> {
   const source = normalizeWhitespace(text);
 
@@ -504,11 +504,11 @@ export async function parseClinicalDictation(
 
   let normalizedTranscript = source;
 
-  const localAIEnabled =
-    options.useLocalAI !== false &&
-    process.env.LOCAL_LLM_DISABLED !== 'true';
+  const clinicalAIEnabled =
+    options.useClinicalAI !== false &&
+    process.env.CLINICAL_AI_DISABLED !== 'true';
 
-  if (localAIEnabled) {
+  if (clinicalAIEnabled) {
     try {
       normalizedTranscript =
         await normalizeWithLocalAI(source);
@@ -530,7 +530,7 @@ export async function parseClinicalDictation(
       return {
         encounter: record.encounter,
         soap: record.soap,
-        extractionMode: 'local-ai',
+        extractionMode: 'clinical-ai',
       };
     } catch (error) {
       console.warn(

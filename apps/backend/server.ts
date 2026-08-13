@@ -134,9 +134,9 @@ async function startServer(): Promise<void> {
 
   let aiReady = false;
 
-  if (process.env.LOCAL_LLM_DISABLED !== 'true') {
+  if (process.env.CLINICAL_AI_DISABLED !== 'true') {
     process.stdout.write(
-      `Preparing local clinical AI (${process.env.LOCAL_MODEL_NAME || 'qwen3-josh:latest'})… `,
+      'Preparing clinical AI… ',
     );
 
     try {

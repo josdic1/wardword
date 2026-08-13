@@ -15,7 +15,7 @@ On physical examination, diffuse erythematous plaques with thick, silvery-white 
 Assessment is a severe exacerbation of chronic plaque psoriasis with early signs of psoriatic arthritis involvement. Plan: Initiate high-potency topical corticosteroid therapy for thick plaques, prescribe a concurrent vitamin D analogue, schedule a consultation for narrowband UVB phototherapy, and order baseline laboratory panels to evaluate systemic treatment options. Follow-up scheduled in four weeks.`;
 
 test('bronchitis dictation is separated without cross-contaminating sections', async () => {
-  const { soap, extractionMode } = await parseClinicalDictation(bronchitis, { useLocalAI: false });
+  const { soap, extractionMode } = await parseClinicalDictation(bronchitis, { useClinicalAI: false });
 
   assert.equal(extractionMode, 'structured-fallback');
   assert.match(soap.subjective, /productive cough/i);
@@ -28,7 +28,7 @@ test('bronchitis dictation is separated without cross-contaminating sections', a
 });
 
 test('psoriasis dictation is separated into the intended SOAP fields', async () => {
-  const { soap } = await parseClinicalDictation(psoriasis, { useLocalAI: false });
+  const { soap } = await parseClinicalDictation(psoriasis, { useClinicalAI: false });
 
   assert.match(soap.subjective, /severe pruritus/i);
   assert.match(soap.objective, /erythematous plaques/i);
