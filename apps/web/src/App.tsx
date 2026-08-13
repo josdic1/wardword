@@ -62,6 +62,8 @@ export function App() {
     useState<ProcessingStage>(null);
   const [recording, setRecording] = useState(false);
   const [recordingPaused, setRecordingPaused] = useState(false);
+  const [recordingStarting, setRecordingStarting] = useState(false);
+  const [recordingStopping, setRecordingStopping] = useState(false);
   const [extractionMode, setExtractionMode] = useState<'clinical-ai' | 'structured-fallback' | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -247,7 +249,8 @@ export function App() {
     }
 
     setBusy(true);
-    setStatus('Requesting microphone access…');
+    setRecordingStarting(true);
+    setStatus('Starting microphone…');
 
     try {
       const stream =
@@ -294,6 +297,8 @@ export function App() {
 
         setRecording(false);
         setRecordingPaused(false);
+        setRecordingStarting(false);
+        setRecordingStopping(false);
         setBusy(false);
         setStatus(
           'Recording failed. You can type or paste the dictation instead.',
@@ -303,6 +308,7 @@ export function App() {
       recorder.onstop = async () => {
         setRecording(false);
         setRecordingPaused(false);
+        setRecordingStopping(false);
         setBusy(true);
         setProcessingStage('transcribing');
         setStatus('Transcribing…');
@@ -360,6 +366,7 @@ export function App() {
 
       setRecording(true);
       setRecordingPaused(false);
+      setRecordingStarting(false);
       setBusy(false);
       setStatus('Recording…');
     } catch (error) {
@@ -367,6 +374,7 @@ export function App() {
       setBusy(false);
       setRecording(false);
       setRecordingPaused(false);
+      setRecordingStarting(false);
 
       setStatus(
         error instanceof Error
@@ -404,6 +412,12 @@ export function App() {
       return;
     }
 
+    if (recordingStopping) {
+      return;
+    }
+
+    setRecordingStopping(true);
+    setBusy(true);
     setStatus('Finishing recording…');
     recorder.stop();
   }
@@ -574,9 +588,9 @@ export function App() {
                       }
                       type="button"
                       onClick={stopRecording}
-                      disabled={busy}
+                      disabled={busy || recordingStopping}
                     >
-                      Stop & review
+                      {recordingStopping ? 'Finishing…' : 'Stop & review'}
                     </button>
                   </>
                 ) : (
@@ -585,9 +599,9 @@ export function App() {
                       className="button button--secondary"
                       type="button"
                       onClick={startRecording}
-                      disabled={busy}
+                      disabled={busy || recordingStarting}
                     >
-                      Start dictation
+                      {recordingStarting ? 'Starting microphone…' : 'Start dictation'}
                     </button>
                     <button
                       className="button button--primary"
