@@ -437,7 +437,7 @@ export function App() {
         }
       };
 
-      recorder.start();
+      recorder.start(1000);
 
       setRecording(true);
       setRecordingPaused(false);
