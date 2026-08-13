@@ -1,0 +1,22 @@
+{
+  "name": "IRVING+",
+  "short_name": "IRVING+",
+  "description": "Clinical dictation",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f5d48",
+  "icons": [
+    {
+      "src": "/irving-app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/irving-app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
