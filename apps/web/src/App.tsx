@@ -70,6 +70,7 @@ export function App() {
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const transcriptRef = useRef('');
+  const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
 
   const waveformCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -182,6 +183,49 @@ export function App() {
     }
   }
 
+  async function requestRecordingWakeLock() {
+    if (
+      document.visibilityState !== 'visible' ||
+      wakeLockRef.current
+    ) {
+      return;
+    }
+
+    const wakeLockNavigator = navigator as Navigator & {
+      wakeLock?: {
+        request: (
+          type: 'screen',
+        ) => Promise<{ release: () => Promise<void> }>;
+      };
+    };
+
+    if (!wakeLockNavigator.wakeLock) {
+      return;
+    }
+
+    try {
+      wakeLockRef.current =
+        await wakeLockNavigator.wakeLock.request('screen');
+    } catch {
+      // Recording must remain usable even when wake lock is unavailable.
+    }
+  }
+
+  async function releaseRecordingWakeLock() {
+    const wakeLock = wakeLockRef.current;
+    wakeLockRef.current = null;
+
+    if (!wakeLock) {
+      return;
+    }
+
+    try {
+      await wakeLock.release();
+    } catch {
+      // The system may already have released it.
+    }
+  }
+
   async function loadNotes() {
     try {
       setNotes(await fetchNotes());
@@ -204,8 +248,39 @@ export function App() {
   }, [recording, recordingPaused]);
 
   useEffect(() => {
+    if (!recording) {
+      void releaseRecordingWakeLock();
+      return;
+    }
+
+    void requestRecordingWakeLock();
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        void requestRecordingWakeLock();
+      } else {
+        wakeLockRef.current = null;
+      }
+    }
+
+    document.addEventListener(
+      'visibilitychange',
+      handleVisibilityChange,
+    );
+
+    return () => {
+      document.removeEventListener(
+        'visibilitychange',
+        handleVisibilityChange,
+      );
+      void releaseRecordingWakeLock();
+    };
+  }, [recording]);
+
+  useEffect(() => {
     return () => {
       stopAudioAnalysis();
+      void releaseRecordingWakeLock();
     };
   }, []);
 
