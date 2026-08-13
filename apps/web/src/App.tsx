@@ -34,18 +34,18 @@ type ProcessingStage =
 const processingCopy = {
   transcribing: {
     eyebrow: 'Processing dictation',
-    title: 'Transcribing audio locally…',
+    title: 'Transcribing audio…',
     detail: 'Converting the recording into a clinical transcript.',
   },
   structuring: {
     eyebrow: 'Preparing clinical record',
     title: 'Normalizing terminology and structuring SOAP…',
-    detail: 'Irving is organizing the transcript for review.',
+    detail: 'Organizing the transcript for review.',
   },
   saving: {
     eyebrow: 'Saving record',
     title: 'Saving reviewed clinical note…',
-    detail: 'Writing the verified record to the local archive.',
+    detail: 'Writing the verified record to the archive.',
   },
 } as const;
 
@@ -305,7 +305,7 @@ export function App() {
         setRecordingPaused(false);
         setBusy(true);
         setProcessingStage('transcribing');
-        setStatus('Transcribing locally…');
+        setStatus('Transcribing…');
 
         const chunks = audioChunksRef.current;
         audioChunksRef.current = [];
@@ -361,7 +361,7 @@ export function App() {
       setRecording(true);
       setRecordingPaused(false);
       setBusy(false);
-      setStatus('Recording locally…');
+      setStatus('Recording…');
     } catch (error) {
       stopAudioAnalysis();
       setBusy(false);
@@ -393,7 +393,7 @@ export function App() {
     if (recorder.state === 'paused') {
       recorder.resume();
       setRecordingPaused(false);
-      setStatus('Recording locally…');
+      setStatus('Recording…');
     }
   }
 
@@ -465,7 +465,7 @@ export function App() {
         </div>
         <div className="topbar-actions">
           <div className="privacy-indicator">
-            <span /> Local record
+            <span /> Clinician review
           </div>
 
           {screen !== 'review' ? (
@@ -665,7 +665,7 @@ export function App() {
             </div>
 
             {extractionMode === 'structured-fallback' ? (
-              <p className="processing-note">Local AI was unavailable. WardWord separated the dictated sections without inventing missing clinical content.</p>
+              <p className="processing-note">AI structuring was unavailable. WardWord separated the dictated sections without inventing missing clinical content.</p>
             ) : null}
           </section>
         ) : (
@@ -709,7 +709,7 @@ export function App() {
                   {processingCopy[processingStage].title}
                 </strong>
               </div>
-              <span>Working locally</span>
+              <span>Processing</span>
             </div>
 
             <div className="processing-skeleton" aria-hidden="true">

@@ -5,9 +5,13 @@ import path from 'path';
 import {
   PreviewNoteRequestSchema,
   SaveNoteRequestSchema,
-  SavedNoteSchema,
   type SavedNote,
 } from '@wardform/shared';
+import {
+  initializeDatabase,
+  listNotes,
+  saveNote,
+} from './src/database';
 import { parseClinicalDictation } from './src/services/clinicalParser';
 import { warmLocalLLM } from './src/services/llmService';
 import { transcribeAudio } from './src/services/transcriptionService';
@@ -23,37 +27,22 @@ function resolveBackendDir(): string {
 }
 
 const backendDir = resolveBackendDir();
-const dataFile = process.env.DATA_FILE || path.join(backendDir, 'notes.json');
 const webDist = path.resolve(backendDir, '../web/dist');
 
 app.use(express.json({ limit: '1mb' }));
-
-function loadNotes(): SavedNote[] {
-  if (!fs.existsSync(dataFile)) return [];
-
-  try {
-    const parsed = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
-    const result = SavedNoteSchema.array().safeParse(parsed);
-    return result.success ? result.data : [];
-  } catch {
-    return [];
-  }
-}
-
-let notes = loadNotes();
-
-function persistNotes(): void {
-  const tempFile = `${dataFile}.tmp`;
-  fs.writeFileSync(tempFile, JSON.stringify(notes, null, 2));
-  fs.renameSync(tempFile, dataFile);
-}
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.get('/api/notes', (_req, res) => {
-  res.json(notes);
+app.get('/api/notes', async (_req, res) => {
+  try {
+    const notes = await listNotes();
+    return res.json(notes);
+  } catch (error) {
+    console.error('Unable to load clinical notes:', error);
+    return res.status(500).json({ error: 'Unable to load clinical notes.' });
+  }
 });
 
 app.post(
@@ -108,7 +97,7 @@ app.post('/api/notes/preview', async (req, res) => {
   }
 });
 
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', async (req, res) => {
   const request = SaveNoteRequestSchema.safeParse(req.body);
   if (!request.success) {
     return res.status(400).json({ error: 'A reviewed SOAP note is required.' });
@@ -122,9 +111,13 @@ app.post('/api/notes', (req, res) => {
     createdAt: new Date().toISOString(),
   };
 
-  notes = [note, ...notes];
-  persistNotes();
-  return res.status(201).json(note);
+  try {
+    const saved = await saveNote(note);
+    return res.status(201).json(saved);
+  } catch (error) {
+    console.error('Unable to save clinical note:', error);
+    return res.status(500).json({ error: 'Unable to save clinical note.' });
+  }
 });
 
 if (fs.existsSync(webDist)) {
@@ -136,6 +129,9 @@ if (fs.existsSync(webDist)) {
 }
 
 async function startServer(): Promise<void> {
+  await initializeDatabase();
+  console.log('Database: ready');
+
   let aiReady = false;
 
   if (process.env.LOCAL_LLM_DISABLED !== 'true') {
@@ -150,14 +146,14 @@ async function startServer(): Promise<void> {
     } catch (error) {
       console.log('unavailable.');
       console.warn(
-        'WardForm will use the conservative structured fallback until Ollama is available:',
+        'WardWord will use the conservative structured fallback until clinical AI is available:',
         error instanceof Error ? error.message : error,
       );
     }
   }
 
   app.listen(port, host, () => {
-    console.log(`WardForm ready at http://localhost:${port}`);
+    console.log(`WardWord ready at http://localhost:${port}`);
     console.log(
       `Clinical AI: ${aiReady ? 'ready' : 'fallback mode'}`,
     );

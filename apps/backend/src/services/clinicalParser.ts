@@ -267,7 +267,7 @@ ${text}`,
 
   if (!normalized) {
     throw new Error(
-      'Local AI returned an empty normalized transcript',
+      'Clinical AI returned an empty normalized transcript',
     );
   }
 
@@ -278,7 +278,7 @@ ${text}`,
  * Stage 2:
  * Extract atomic clinical facts.
  *
- * Irving identifies facts and their semantic type.
+ * The configured clinical AI identifies facts and their semantic type.
  * Code — not the model — owns SOAP section placement.
  */
 async function extractFactLedgerWithLocalAI(
@@ -378,7 +378,7 @@ ${normalizedTranscript}`,
 
   if (parsed.facts.length === 0) {
     throw new Error(
-      'Local AI returned no clinical facts for non-empty dictation',
+      'Clinical AI returned no clinical facts for non-empty dictation',
     );
   }
 
@@ -514,7 +514,7 @@ export async function parseClinicalDictation(
         await normalizeWithLocalAI(source);
     } catch (error) {
       console.warn(
-        'Local AI normalization unavailable; continuing with source transcript.',
+        'Clinical AI normalization unavailable; continuing with source transcript.',
         error instanceof Error
           ? error.message
           : error,
@@ -534,7 +534,7 @@ export async function parseClinicalDictation(
       };
     } catch (error) {
       console.warn(
-        'Local AI SOAP extraction unavailable; using structured fallback.',
+        'Clinical AI fact extraction unavailable; using structured fallback.',
         error instanceof Error
           ? error.message
           : error,
