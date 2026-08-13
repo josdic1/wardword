@@ -632,11 +632,26 @@ textarea {
 
 .records-search__field {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.records-search,
+.records-sort {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .records-search__field input,
 .records-sort select {
+  box-sizing: border-box;
+  display: block;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   height: 42px;
   border: 1px solid #ccd2ce;
   border-radius: 9px;
@@ -899,10 +914,32 @@ textarea {
   }
 
   .records-table-shell {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     border: 0;
     border-radius: 0;
     background: transparent;
     box-shadow: none;
+  }
+
+  .records-screen,
+  .records-toolbar,
+  .records-meta-row,
+  .records-table,
+  .records-table tbody,
+  .records-table__row,
+  .records-table__detail-row,
+  .records-table__detail {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .records-table__row td,
+  .records-table__detail p,
+  .records-table__detail section {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .records-table,
