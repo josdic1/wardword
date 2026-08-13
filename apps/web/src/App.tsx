@@ -11,6 +11,11 @@ import {
   saveNote,
   transcribeRecording,
 } from './services/apiClient';
+import {
+  appendRecordingRecoveryChunk,
+  beginRecordingRecovery,
+  clearRecordingRecovery,
+} from './services/recordingRecovery';
 
 const emptyEncounter: EncounterMetadata = {
   patientName: '',
@@ -69,6 +74,7 @@ export function App() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const recordingChunkSequenceRef = useRef(0);
   const transcriptRef = useRef('');
   const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
 
@@ -353,10 +359,26 @@ export function App() {
         : new MediaRecorder(stream);
 
       mediaRecorderRef.current = recorder;
+      recordingChunkSequenceRef.current = 0;
+
+      await beginRecordingRecovery(
+        recorder.mimeType || mimeType || 'audio/webm',
+        transcriptRef.current,
+      );
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+
+          const sequence =
+            recordingChunkSequenceRef.current++;
+
+          void appendRecordingRecoveryChunk(
+            sequence,
+            event.data,
+          ).catch(() => {
+            // Keep recording even if local recovery storage fails.
+          });
         }
       };
 
@@ -425,6 +447,7 @@ export function App() {
           transcriptRef.current = combined;
           setTextInput(combined);
 
+          await clearRecordingRecovery();
           await buildPreview(combined);
         } catch (error) {
           setBusy(false);
