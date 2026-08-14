@@ -608,6 +608,25 @@ export function App() {
     setStatus('Editing saved record.');
   }
 
+  const workflowStages = ['dictate', 'transcript', 'soap', 'save'] as const;
+  type WorkflowStage = (typeof workflowStages)[number];
+
+  const workflowStage: WorkflowStage =
+    processingStage === 'saving'
+      ? 'save'
+      : screen === 'review'
+        ? 'soap'
+        : textInput.trim() && !recording && !recordingStarting
+          ? 'transcript'
+          : 'dictate';
+
+  const workflowStageLabels: Record<WorkflowStage, string> = {
+    dictate: 'Dictate',
+    transcript: 'Transcript',
+    soap: 'SOAP',
+    save: 'Save',
+  };
+
   async function handleSave() {
     setBusy(true);
     setProcessingStage('saving');
@@ -689,6 +708,35 @@ export function App() {
       </header>
 
       <main className={`page page--${screen}`}>
+        {screen !== 'records' ? (
+          <nav className="workflow-rail" aria-label="Clinical note workflow">
+            {workflowStages.map((stage, index) => {
+              const currentIndex = workflowStages.indexOf(workflowStage);
+              const state =
+                index < currentIndex
+                  ? 'complete'
+                  : index === currentIndex
+                    ? 'current'
+                    : 'upcoming';
+
+              return (
+                <div
+                  className={`workflow-rail__stage workflow-rail__stage--${state}`}
+                  aria-current={state === 'current' ? 'step' : undefined}
+                  key={stage}
+                >
+                  <span className="workflow-rail__label">
+                    {state === 'complete' ? (
+                      <span className="workflow-rail__check" aria-hidden="true">✓</span>
+                    ) : null}
+                    {workflowStageLabels[stage]}
+                  </span>
+                </div>
+              );
+            })}
+          </nav>
+        ) : null}
+
         {screen === 'capture' ? (
           <section
             className={
