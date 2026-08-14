@@ -387,6 +387,8 @@ export function App() {
     setStatus('Starting microphone…');
 
     try {
+      await requestRecordingWakeLock();
+
       const stream =
         await navigator.mediaDevices.getUserMedia({
           audio: true,
