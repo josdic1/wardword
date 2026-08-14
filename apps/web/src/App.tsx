@@ -388,7 +388,7 @@ export function App() {
     setStatus('Starting microphone…');
 
     try {
-      await requestRecordingWakeLock();
+      void requestRecordingWakeLock();
 
       const stream =
         await navigator.mediaDevices.getUserMedia({
@@ -417,10 +417,12 @@ export function App() {
       mediaRecorderRef.current = recorder;
       recordingChunkSequenceRef.current = 0;
 
-      await beginRecordingRecovery(
+      void beginRecordingRecovery(
         recorder.mimeType || mimeType || 'audio/webm',
         transcriptRef.current,
-      );
+      ).catch(() => {
+        // Recovery storage must never block recording startup.
+      });
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
