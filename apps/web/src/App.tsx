@@ -501,7 +501,9 @@ export function App() {
           setTextInput(combined);
 
           await clearRecordingRecovery();
-          await buildPreview(combined);
+          setBusy(false);
+          setProcessingStage(null);
+          setStatus('Transcription ready. Review or edit it before SOAP.');
         } catch (error) {
           setBusy(false);
           setProcessingStage(null);
