@@ -885,6 +885,33 @@ textarea {
   font-size: 12px;
 }
 
+
+.records-table__detail-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--soft-line);
+}
+
+.records-table__edit-button {
+  width: auto;
+  min-height: 34px;
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  color: var(--clinical);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.records-table__edit-button:hover {
+  background: #f5f8f6;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

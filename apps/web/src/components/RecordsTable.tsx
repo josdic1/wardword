@@ -338,12 +338,15 @@ export function RecordsTable({
                               <p>{note.content}</p>
                             </details>
 
-                            <button
-                              type="button"
-                              onClick={() => onEdit(note)}
-                            >
-                              Edit record
-                            </button>
+                            <div className="records-table__detail-actions">
+                              <button
+                                className="records-table__edit-button"
+                                type="button"
+                                onClick={() => onEdit(note)}
+                              >
+                                Edit record
+                              </button>
+                            </div>
                           </div>
                         </td>
                       </tr>
