@@ -9,6 +9,7 @@ type SortMode =
 
 interface RecordsTableProps {
   notes: SavedNote[];
+  onEdit: (note: SavedNote) => void;
 }
 
 const soapSections = [
@@ -94,7 +95,10 @@ function notesAsText(notes: SavedNote[]): string {
     .join('\n\n' + '─'.repeat(72) + '\n\n');
 }
 
-export function RecordsTable({ notes }: RecordsTableProps) {
+export function RecordsTable({
+  notes,
+  onEdit,
+}: RecordsTableProps) {
   const [query, setQuery] = useState('');
   const [sortMode, setSortMode] =
     useState<SortMode>('newest');
@@ -333,6 +337,13 @@ export function RecordsTable({ notes }: RecordsTableProps) {
                               <summary>Source dictation</summary>
                               <p>{note.content}</p>
                             </details>
+
+                            <button
+                              type="button"
+                              onClick={() => onEdit(note)}
+                            >
+                              Edit record
+                            </button>
                           </div>
                         </td>
                       </tr>

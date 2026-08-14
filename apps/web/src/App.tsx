@@ -10,6 +10,7 @@ import {
   previewNote,
   saveNote,
   transcribeRecording,
+  updateNote,
 } from './services/apiClient';
 import {
   appendRecordingRecoveryChunk,
@@ -71,6 +72,7 @@ export function App() {
   const [recordingStarting, setRecordingStarting] = useState(false);
   const [recordingStopping, setRecordingStopping] = useState(false);
   const [extractionMode, setExtractionMode] = useState<'clinical-ai' | 'structured-fallback' | null>(null);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -589,25 +591,51 @@ export function App() {
     setSoap((current) => ({ ...current, [field]: value }));
   }
 
+  function handleEditRecord(note: SavedNote) {
+    setEditingNoteId(note.id);
+    setTextInput(note.content);
+    transcriptRef.current = note.content;
+    setEncounter(note.encounter);
+    setSoap(note.soap);
+    setExtractionMode('clinical-ai');
+    setScreen('capture');
+    setStatus('Editing saved record.');
+  }
+
   async function handleSave() {
     setBusy(true);
     setProcessingStage('saving');
     setStatus('Saving reviewed note…');
 
     try {
-      const saved = await saveNote(
-        textInput,
-        encounter,
-        soap,
+      const saved = editingNoteId
+        ? await updateNote(
+            editingNoteId,
+            textInput,
+            encounter,
+            soap,
+          )
+        : await saveNote(
+            textInput,
+            encounter,
+            soap,
+          );
+
+      setNotes((current) =>
+        editingNoteId
+          ? current.map((note) =>
+              note.id === saved.id ? saved : note,
+            )
+          : [saved, ...current],
       );
-      setNotes((current) => [saved, ...current]);
       setTextInput('');
       transcriptRef.current = '';
       setEncounter(emptyEncounter);
       setSoap(emptySoap);
       setExtractionMode(null);
+      setEditingNoteId(null);
       setScreen('capture');
-      setStatus('Clinical note saved.');
+      setStatus(editingNoteId ? 'Clinical note updated.' : 'Clinical note saved.');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Unable to save this note.');
     } finally {
@@ -874,7 +902,10 @@ export function App() {
               </p>
             </div>
 
-            <RecordsTable notes={notes} />
+            <RecordsTable
+              notes={notes}
+              onEdit={handleEditRecord}
+            />
           </section>
         )}
 

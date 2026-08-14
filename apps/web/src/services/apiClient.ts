@@ -73,3 +73,20 @@ export function saveNote(
     }),
   });
 }
+
+export function updateNote(
+  id: string,
+  content: string,
+  encounter: EncounterMetadata,
+  soap: SoapFields,
+): Promise<SavedNote> {
+  return request<SavedNote>(`/api/notes/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      content,
+      encounter,
+      soap,
+    }),
+  });
+}

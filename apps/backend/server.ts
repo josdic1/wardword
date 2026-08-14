@@ -11,6 +11,7 @@ import {
   initializeDatabase,
   listNotes,
   saveNote,
+  updateNote,
 } from './src/database';
 import { parseClinicalDictation } from './src/services/clinicalParser';
 import { warmLocalLLM } from './src/services/llmService';
@@ -117,6 +118,64 @@ app.post('/api/notes', async (req, res) => {
   } catch (error) {
     console.error('Unable to save clinical note:', error);
     return res.status(500).json({ error: 'Unable to save clinical note.' });
+  }
+});
+
+
+app.put('/api/notes/:id', async (req, res) => {
+  const request = SaveNoteRequestSchema.safeParse(req.body);
+  if (!request.success) {
+    return res.status(400).json({ error: 'A reviewed SOAP note is required.' });
+  }
+
+  const existing = (await listNotes()).find((note) => note.id === req.params.id);
+  if (!existing) {
+    return res.status(404).json({ error: 'Clinical note not found.' });
+  }
+
+  const note: SavedNote = {
+    id: existing.id,
+    content: request.data.content,
+    encounter: request.data.encounter,
+    soap: request.data.soap,
+    createdAt: existing.createdAt,
+  };
+
+  try {
+    const updated = await updateNote(note);
+    return res.json(updated);
+  } catch (error) {
+    console.error('Unable to update clinical note:', error);
+    return res.status(500).json({ error: 'Unable to update clinical note.' });
+  }
+});
+
+
+app.put('/api/notes/:id', async (req, res) => {
+  const request = SaveNoteRequestSchema.safeParse(req.body);
+  if (!request.success) {
+    return res.status(400).json({ error: 'A reviewed SOAP note is required.' });
+  }
+
+  const existing = (await listNotes()).find((note) => note.id === req.params.id);
+  if (!existing) {
+    return res.status(404).json({ error: 'Clinical note not found.' });
+  }
+
+  const note: SavedNote = {
+    id: existing.id,
+    content: request.data.content,
+    encounter: request.data.encounter,
+    soap: request.data.soap,
+    createdAt: existing.createdAt,
+  };
+
+  try {
+    const updated = await updateNote(note);
+    return res.json(updated);
+  } catch (error) {
+    console.error('Unable to update clinical note:', error);
+    return res.status(500).json({ error: 'Unable to update clinical note.' });
   }
 });
 

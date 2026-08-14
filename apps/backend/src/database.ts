@@ -120,3 +120,37 @@ export async function saveNote(note: SavedNote): Promise<SavedNote> {
 
   return parsed;
 }
+
+export async function updateNote(note: SavedNote): Promise<SavedNote> {
+  const parsed = SavedNoteSchema.parse(note);
+
+  const result = await getPool().query(
+    `
+      UPDATE clinical_notes
+      SET
+        patient_name = $2,
+        content = $3,
+        subjective = $4,
+        objective = $5,
+        assessment = $6,
+        plan = $7
+      WHERE id = $1
+      RETURNING id
+    `,
+    [
+      parsed.id,
+      parsed.encounter.patientName,
+      parsed.content,
+      parsed.soap.subjective,
+      parsed.soap.objective,
+      parsed.soap.assessment,
+      parsed.soap.plan,
+    ],
+  );
+
+  if (!result.rowCount) {
+    throw new Error('Clinical note not found.');
+  }
+
+  return parsed;
+}
