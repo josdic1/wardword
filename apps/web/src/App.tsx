@@ -73,6 +73,7 @@ export function App() {
   const [recordingStopping, setRecordingStopping] = useState(false);
   const [extractionMode, setExtractionMode] = useState<'clinical-ai' | 'structured-fallback' | null>(null);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [transcriptNeedsReview, setTranscriptNeedsReview] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -501,11 +502,12 @@ export function App() {
 
           transcriptRef.current = combined;
           setTextInput(combined);
+          setTranscriptNeedsReview(true);
 
           await clearRecordingRecovery();
           setBusy(false);
           setProcessingStage(null);
-          setStatus('Transcription ready. Review or edit it before SOAP.');
+          setStatus('Review transcription before SOAP.');
         } catch (error) {
           setBusy(false);
           setProcessingStage(null);
@@ -742,6 +744,7 @@ export function App() {
                   onChange={(event) => {
                     setTextInput(event.target.value);
                     transcriptRef.current = event.target.value;
+                    setTranscriptNeedsReview(false);
                   }}
                   placeholder="Dictate the visit naturally, or paste a test script here."
                   rows={9}
@@ -810,7 +813,11 @@ export function App() {
                       onClick={() => void buildPreview()}
                       disabled={busy || !textInput.trim()}
                     >
-                      {busy ? 'Structuring…' : 'Review SOAP'}
+                      {busy
+                        ? 'Structuring…'
+                        : transcriptNeedsReview
+                          ? 'Review transcription, then SOAP'
+                          : 'Review SOAP'}
                     </button>
                   </>
                 )}
